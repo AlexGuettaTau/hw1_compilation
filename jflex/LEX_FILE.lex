@@ -102,7 +102,10 @@ STRING 			= \"[a-zA-Z]*\"
 LineTerminator	= \r|\n|\r\n
 WhiteSpace		= {LineTerminator} | [ \t]
 INTEGER			= [0-9]+
-ID				= [a-zA-Z]+[a-zA-Z0-9]*
+ID				= [a-zA-Z][a-zA-Z0-9]*
+VALID 			= [a-zA-Z0-9()\[\]{}?!+\-*/.;]
+COMMENT1		= "//" {VALID}* {LineTerminator} 
+%state COMMENT2
 
 
 /******************************/
@@ -148,6 +151,15 @@ ID				= [a-zA-Z]+[a-zA-Z0-9]*
 		return symbol(TokenNames.NUMBER, Integer.valueOf(yytext()));
 }
 {ID}				{ return symbol(TokenNames.ID,     yytext());}
-{WhiteSpace}		{ /* just skip what was found, do nothing */ }
+{WhiteSpace}		{}
+"/*"				{ yybegin(COMMENT2); }
+[^]					{ throw new LexicalException(); }
 <<EOF>>				{ return symbol(TokenNames.EOF);}
+}
+
+<COMMENT2> {
+	"*/"						{ yybegin(YYINITIAL); }
+	({VALID} | {WhiteSpace})+	{}
+	[^]							{ throw new LexicalException(); }
+	<<EOF>>						{ throw new LexicalException(); }
 }
