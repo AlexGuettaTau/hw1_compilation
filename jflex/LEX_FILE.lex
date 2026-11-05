@@ -1,4 +1,4 @@
-/***************************/
+ /***************************/
 /* FILE NAME: LEX_FILE.lex */
 /***************************/
 
@@ -103,8 +103,8 @@ LineTerminator	= \r|\n|\r\n
 WhiteSpace		= {LineTerminator} | [ \t]
 INTEGER			= [0-9]+
 ID				= [a-zA-Z][a-zA-Z0-9]*
-VALID 			= [a-zA-Z0-9()\[\]{}?!+\-*/.;]
-COMMENT1		= "//" {VALID}* {LineTerminator} 
+VALID 			= [a-zA-Z0-9()\[\]{}?!+\-*/.;\t ]
+%state COMMENT1
 %state COMMENT2
 
 
@@ -126,6 +126,21 @@ COMMENT1		= "//" {VALID}* {LineTerminator}
 
 <YYINITIAL> {
 
+"//"				{ yybegin(COMMENT1); }
+"/*"				{ yybegin(COMMENT2); }
+CLASS				{ return symbol(TokenNames.CLASS);}
+NIL					{ return symbol(TokenNames.NIL);}	
+ARRAY				{ return symbol(TokenNames.ARRAY);}
+WHILE				{ return symbol(TokenNames.WHILE);}
+TYPE_INT			{ return symbol(TokenNames.TYPE_INT);}
+TYPE_VOID			{ return symbol(TokenNames.TYPE_VOID);}
+EXTENDS				{ return symbol(TokenNames.EXTENDS);}
+RETURN				{ return symbol(TokenNames.RETURN);}
+NEW					{ return symbol(TokenNames.NEW);}
+IF					{ return symbol(TokenNames.IF);}
+ELSE				{ return symbol(TokenNames.ELSE);}
+TYPE_STRING			{ return symbol(TokenNames.TYPE_STRING);}
+STRING				{ return symbol(TokenNames.STRING, yytext());}
 "+"					{ return symbol(TokenNames.PLUS);}
 "-"					{ return symbol(TokenNames.MINUS);}
 "*"					{ return symbol(TokenNames.TIMES);}
@@ -145,21 +160,26 @@ COMMENT1		= "//" {VALID}* {LineTerminator}
 "."					{ return symbol(TokenNames.DOT);}
 ";"					{ return symbol(TokenNames.SEMICOLON);}
 ":="				{ return symbol(TokenNames.ASSIGN);}
-{INTEGER}			
-{
+{INTEGER}			{
 	if (isValidInteger(yytext()))
 		return symbol(TokenNames.NUMBER, Integer.valueOf(yytext()));
 }
 {ID}				{ return symbol(TokenNames.ID,     yytext());}
 {WhiteSpace}		{}
-"/*"				{ yybegin(COMMENT2); }
 [^]					{ throw new LexicalException(); }
 <<EOF>>				{ return symbol(TokenNames.EOF);}
 }
 
+<COMMENT1> {
+	{LineTerminator}				{ yybegin(YYINITIAL); }
+	{VALID}+	{}
+	[^]							{ throw new LexicalException(); }
+	<<EOF>>						{ throw new LexicalException(); }
+}
+
 <COMMENT2> {
 	"*/"						{ yybegin(YYINITIAL); }
-	({VALID} | {WhiteSpace})+	{}
+	({VALID} | {WhiteSpace})	{}
 	[^]							{ throw new LexicalException(); }
 	<<EOF>>						{ throw new LexicalException(); }
 }

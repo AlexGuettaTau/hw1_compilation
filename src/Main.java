@@ -36,28 +36,22 @@ public class Main {
 			/* [5] Main reading tokens loop */
 			/********************************/
 			while (s.sym != TokenNames.EOF) {
+				String tokenName = getTokenName(s.sym);
 				/************************/
 				/* [6] Print to console */
 				/************************/
-				System.out.print("[");
-				System.out.print(l.getLine());
-				System.out.print(",");
-				System.out.print(l.getTokenStartPosition());
-				System.out.print("]:");
-				System.out.print(s.value);
-				System.out.print("\n");
+				String tokenOutput = tokenName;
+				if (s.sym == TokenNames.INT || s.sym == TokenNames.STRING || s.sym == TokenNames.ID) {
+					tokenOutput += " (" + s.value + ")";
+				}
+				tokenOutput += " [" + l.getLine() + "," + l.getTokenStartPosition() + "]";
 
-				/*********************/
-				/* [7] Print to file */
-				/*********************/
-				fileWriter.print(l.getLine());
-				fileWriter.print(": ");
-				fileWriter.print(s.value);
-				fileWriter.print("\n");
+				// הדפסה לקונסול
+				System.out.println(tokenOutput);
 
-				/***********************/
-				/* [8] Read next token */
-				/***********************/
+				// הדפסה לקובץ הפלט לפי הפורמט המדויק של המטלה
+				fileWriter.println(tokenOutput);
+
 				s = l.next_token();
 			}
 
@@ -76,6 +70,83 @@ public class Main {
 			writer.close();
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	private static String getTokenName(int sym) {
+		switch (sym) {
+			case TokenNames.EOF:
+				return "EOF";
+			case TokenNames.PLUS:
+				return "PLUS";
+			case TokenNames.MINUS:
+				return "MINUS";
+			case TokenNames.TIMES:
+				return "TIMES";
+			case TokenNames.DIVIDE:
+				return "DIVIDE";
+			case TokenNames.LPAREN:
+				return "LPAREN";
+			case TokenNames.RPAREN:
+				return "RPAREN";
+			case TokenNames.INT:
+				return "INT";
+			case TokenNames.ID:
+				return "ID";
+			case TokenNames.STRING:
+				return "STRING";
+			case TokenNames.EQ:
+				return "EQ";
+			case TokenNames.LT:
+				return "LT";
+			case TokenNames.GT:
+				return "GT";
+			case TokenNames.AND:
+				return "AND";
+			case TokenNames.OR:
+				return "OR";
+			case TokenNames.LBRACK:
+				return "LBRACK";
+			case TokenNames.RBRACK:
+				return "RBRACK";
+			case TokenNames.LBRACE:
+				return "LBRACE";
+			case TokenNames.RBRACE:
+				return "RBRACE";
+			case TokenNames.COMMA:
+				return "COMMA";
+			case TokenNames.DOT:
+				return "DOT";
+			case TokenNames.SEMICOLON:
+				return "SEMICOLON";
+			case TokenNames.ASSIGN:
+				return "ASSIGN";
+			case TokenNames.CLASS:
+				return "CLASS";
+			case TokenNames.NIL:
+				return "NIL";
+			case TokenNames.ARRAY:
+				return "ARRAY";
+			case TokenNames.WHILE:
+				return "WHILE";
+			case TokenNames.TYPE_INT:
+				return "TYPE_INT";
+			case TokenNames.TYPE_VOID:
+				return "TYPE_VOID";
+			case TokenNames.EXTENDS:
+				return "EXTENDS";
+			case TokenNames.RETURN:
+				return "RETURN";
+			case TokenNames.NEW:
+				return "NEW";
+			case TokenNames.IF:
+				return "IF";
+			case TokenNames.ELSE:
+				return "ELSE";
+			case TokenNames.TYPE_STRING:
+				return "TYPE_STRING";
+			default:
+				return "UNKNOWN";
 		}
 	}
 }
